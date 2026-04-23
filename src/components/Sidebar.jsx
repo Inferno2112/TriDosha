@@ -14,6 +14,11 @@ export function Sidebar() {
       path: '/dashboard',
     },
     {
+      label: 'AI Chat',
+      icon: '💬',
+      path: '/chat',
+    },
+    {
       label: 'Symptoms',
       icon: '🩺',
       path: '/symptoms',

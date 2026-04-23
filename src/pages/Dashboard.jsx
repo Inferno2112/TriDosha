@@ -6,13 +6,13 @@ import { getHealthCheck, getTest } from '../utils/api'
 
 function Dashboard() {
   const user = JSON.parse(localStorage.getItem('user') || '{}')
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     consultations: 12,
     reports: 8,
     symptoms: 45,
   })
 
-  const [recentAssessments, setRecentAssessments] = useState([
+  const [recentAssessments] = useState([
     {
       id: 1,
       date: 'April 20, 2026',
