@@ -3,6 +3,7 @@ import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { Sidebar } from '../components/Sidebar'
 import { Alert } from '../components/Alert'
+import ChatMarkdown from '../components/ChatMarkdown'
 import { cn } from '../utils/cn'
 
 const SUGGESTIONS = [
@@ -149,13 +150,19 @@ function ChatBubble({ message }) {
     <div className={cn('flex', isUser ? 'justify-end' : 'justify-start')}>
       <div
         className={cn(
-          'max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ring-1',
+          'max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ring-1',
           isUser
-            ? 'rounded-br-sm bg-emerald-600 text-white ring-emerald-700/20'
+            ? 'whitespace-pre-wrap rounded-br-sm bg-emerald-600 text-white ring-emerald-700/20'
             : 'rounded-bl-sm bg-white text-slate-800 ring-slate-200',
         )}
       >
-        {text || <span className="text-slate-400">…</span>}
+        {isUser ? (
+          text || <span className="text-white/70">…</span>
+        ) : text ? (
+          <ChatMarkdown>{text}</ChatMarkdown>
+        ) : (
+          <span className="text-slate-400">…</span>
+        )}
       </div>
     </div>
   )
