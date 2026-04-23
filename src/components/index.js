@@ -1,14 +1,16 @@
 import { Sidebar } from './Sidebar'
+import { AppShell } from './AppShell'
+import { PageHeader } from './PageHeader'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './Card'
 import { Button } from './Button'
 import { Badge } from './Badge'
 import { Stat } from './Stat'
 import { Alert } from './Alert'
-import { DashboardLayout } from './DashboardLayout'
-import { ComponentDemo } from './ComponentDemo'
 
 export {
   Sidebar,
+  AppShell,
+  PageHeader,
   Card,
   CardHeader,
   CardTitle,
@@ -19,6 +21,4 @@ export {
   Badge,
   Stat,
   Alert,
-  DashboardLayout,
-  ComponentDemo,
 }
