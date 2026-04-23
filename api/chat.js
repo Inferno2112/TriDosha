@@ -33,11 +33,30 @@ const memoryPromptTemplate = (data) => `
 `.trim()
 
 // Supermemory container tags must match /^[a-zA-Z0-9_:-]+$/. Emails contain
-// '@' and '.', so collapse every disallowed character to '_' to keep each
-// user's bucket stable while staying within the allowed charset.
+// '@' and '.', so we hex-escape every disallowed byte using ':XX' (two lowercase
+// hex digits). ':' is valid in the target charset but cannot appear in an email,
+// so reserving it as the escape prefix keeps the encoding unambiguous and
+// collision-free: distinct inputs always produce distinct tags (e.g.
+// `user.name@d.com` -> `user:2ename:40d:2ecom` while `user_name@d.com` ->
+// `user_name:40d:2ecom`). Naively collapsing disallowed chars to '_' would
+// alias those two emails to the same bucket and leak memories across users.
 function toSupermemoryContainerTag(userId) {
-  const sanitized = userId.replace(/[^a-zA-Z0-9_:-]+/g, '_').replace(/^_+|_+$/g, '')
-  return sanitized || 'anonymous'
+  const bytes = new TextEncoder().encode(userId)
+  let out = ''
+  for (const byte of bytes) {
+    const isAlnum =
+      (byte >= 0x30 && byte <= 0x39) ||
+      (byte >= 0x41 && byte <= 0x5a) ||
+      (byte >= 0x61 && byte <= 0x7a)
+    // Allowed pass-through: alnum, '_' (0x5f), '-' (0x2d).
+    // ':' is allowed by the regex but reserved here as the escape prefix.
+    if (isAlnum || byte === 0x5f || byte === 0x2d) {
+      out += String.fromCharCode(byte)
+    } else {
+      out += ':' + byte.toString(16).padStart(2, '0')
+    }
+  }
+  return out || 'anonymous'
 }
 
 export default async function handler(request) {
