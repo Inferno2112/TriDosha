@@ -13,7 +13,7 @@ function Login() {
   const handleSubmit = (event) => {
     event.preventDefault()
     localStorage.setItem('user', JSON.stringify({ email: formData.email }))
-    navigate('/dashboard')
+    navigate('/chat')
   }
 
   return (
