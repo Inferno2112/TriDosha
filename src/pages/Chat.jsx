@@ -1,10 +1,23 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { Sidebar } from '../components/Sidebar'
 import { Alert } from '../components/Alert'
 import ChatMarkdown from '../components/ChatMarkdown'
 import { cn } from '../utils/cn'
+
+function getCurrentUserId() {
+  try {
+    const raw = localStorage.getItem('user')
+    if (!raw) return 'anonymous'
+    const parsed = JSON.parse(raw)
+    return typeof parsed?.email === 'string' && parsed.email.length > 0
+      ? parsed.email
+      : 'anonymous'
+  } catch {
+    return 'anonymous'
+  }
+}
 
 const SUGGESTIONS = [
   'What are the three doshas in Ayurveda?',
@@ -14,9 +27,18 @@ const SUGGESTIONS = [
 ]
 
 function Chat() {
-  const { messages, sendMessage, status, stop, error } = useChat({
-    transport: new DefaultChatTransport({ api: '/api/chat' }),
-  })
+  const userId = useMemo(() => getCurrentUserId(), [])
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: '/api/chat',
+        prepareSendMessagesRequest: ({ body, messages }) => ({
+          body: { ...body, messages, userId },
+        }),
+      }),
+    [userId],
+  )
+  const { messages, sendMessage, status, stop, error } = useChat({ transport })
 
   const [input, setInput] = useState('')
   const scrollRef = useRef(null)
