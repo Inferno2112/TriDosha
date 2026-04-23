@@ -32,6 +32,14 @@ const memoryPromptTemplate = (data) => `
 </tridosha_memory>
 `.trim()
 
+// Supermemory container tags must match /^[a-zA-Z0-9_:-]+$/. Emails contain
+// '@' and '.', so collapse every disallowed character to '_' to keep each
+// user's bucket stable while staying within the allowed charset.
+function toSupermemoryContainerTag(userId) {
+  const sanitized = userId.replace(/[^a-zA-Z0-9_:-]+/g, '_').replace(/^_+|_+$/g, '')
+  return sanitized || 'anonymous'
+}
+
 export default async function handler(request) {
   if (request.method !== 'POST') {
     return new Response('Method Not Allowed', {
@@ -75,7 +83,7 @@ export default async function handler(request) {
 
   const baseModel = google('gemini-2.5-flash')
   const model = process.env.SUPERMEMORY_API_KEY
-    ? withSupermemory(baseModel, userId, {
+    ? withSupermemory(baseModel, toSupermemoryContainerTag(userId), {
         apiKey: process.env.SUPERMEMORY_API_KEY,
         mode: 'full',
         addMemory: 'always',
